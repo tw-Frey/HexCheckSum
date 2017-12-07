@@ -26,15 +26,15 @@
     </head>
     <body>
         <h1>客製指令 Check-Sum 計算</h1>
-        <h4>v1.1</h4>
+        <h4>v1.2</h4>
+        <hr/>
+        <span>輸入 (不含 Head, Length, Check-Sum)</span>
+        <input id="command" type="text" placeholder="0102 或 01-02" onkeypress="return /^[0-9a-fA-F-_,.]+$/.test(event.key);"/>
         <hr/>
         <span>預覽 (<span style=color:blue>藍: Length</span>, <span style=color:red>紅: Check-Sum</span>)</span>
         <p>FF-55<span id="preview"></span></p>
         <span>結果 (包含 Head, Length, Check-Sum)</span>
         <p>FF55<span id="present"></span></p>
-        <hr/>
-        <span>輸入 (不含 Head, Length, Check-Sum)</span>
-        <input id="command" type="text" placeholder="0102 或 01-02">
     </body>
     <script src=https://code.jquery.com/jquery-3.2.1.min.js></script>
     <script>
@@ -47,12 +47,9 @@
             const $command = $("#command");
             const $preview = $("#preview");
             const $present = $("#present");
-            $command.on("keypress", event => {
-                var key = event.key;
-                if (!KeyRegex.test(key)) {
-                    return false;
-                }
-                let byte_str_arr = ($command.val() + key).replace(separate, "").split("").reduce((result, cur, ind) => {
+            $command.on("input", event => {
+                var key;
+                let byte_str_arr = $command.val().replace(separate, "").split("").reduce((result, cur, ind) => {
                     result[key = ind / 2 >> 0] = (result[key] || "") + cur;
                     return result;
                 }, []);
@@ -62,7 +59,7 @@
                 ).attr("length", "-" + 
                     to_hex_str_with_prefix("0", byte_str_arr_len)
                 ).attr("check-sum", "-" +
-                    [byte_str_arr.reduce((sum, cur) => sum + parseInt(cur, 16), byte_str_arr_len)].reduce(to_hex_str_with_prefix , "0")
+                    to_hex_str_with_prefix("0", byte_str_arr.reduce((sum, cur) => sum + parseInt(cur, 16), byte_str_arr_len))
                 ).change();
             });
             $preview.change(() => $present.text(
