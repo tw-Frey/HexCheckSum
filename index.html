@@ -62,7 +62,7 @@
     </head>
     <body>
         <h1>客製指令 Check-Sum 計算</h1>
-        <h4>v1.3.3</h4>
+        <h4>v1.3.6</h4>
 <pre>
 <h4>Here Rule:</h4>
 <div><span>Head</span><span style=color:blue>Length</span><span>Command</span><span>N1</span><span>N2</span><span>...</span><span>Nx</span><span style=color:red>Sum</span></div>
@@ -102,9 +102,13 @@ except <strong>Head = 0xFF55 (two bytes)</strong>
             const $dec_num = $("#dec_input");
             const $hex_num = $("#hex_input");
             $command.on("input", () => {
-                var key;
-                let byte_str_arr = $command.val().replace(separate, "").split("").reduce((result, cur, ind) => {
-                    result[key = ind / 2 >> 0] = to_hex_str_with_prefix(result[key] || "0", cur);
+                var val = $command.val();
+                if (!val) {
+                    $preview.text(val).removeAttr("length check-sum").change();
+                    return;
+                }
+                let byte_str_arr = val.replace(separate, "").split("").reduce((result, cur, ind) => {
+                    result[val = ind / 2 >> 0] = to_hex_str_with_prefix(result[val] || "0", cur);
                     return result;
                 }, []);
                 let byte_str_arr_len = byte_str_arr.length + 1;
@@ -117,7 +121,7 @@ except <strong>Head = 0xFF55 (two bytes)</strong>
                 ).change();
             });
             $preview.change(() => $present.text(
-                ($preview.attr("length") + $preview.text() + $preview.attr("check-sum")).replace(separate, "")
+                (($preview.attr("length") || "") + $preview.text() + ($preview.attr("check-sum") || "")).replace(separate, "")
             ));
             $dec_num.on("input", () => $hex_num.val("0x" + 
                 //to_hex_str_with_prefix("0", parseInt($dec_num.val() || 0, 10))
