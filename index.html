@@ -26,7 +26,7 @@
     </head>
     <body>
         <h1>客製指令 Check-Sum 計算</h1>
-        <h4>v1.2</h4>
+        <h4>v1.3</h4>
         <hr/>
         <span>輸入 (不含 Head, Length, Check-Sum)</span>
         <input id="command" type="text" placeholder="0102 或 01-02" onkeypress="return /^[0-9a-fA-F-_,.]+$/.test(event.key);"/>
@@ -50,7 +50,7 @@
             $command.on("input", event => {
                 var key;
                 let byte_str_arr = $command.val().replace(separate, "").split("").reduce((result, cur, ind) => {
-                    result[key = ind / 2 >> 0] = (result[key] || "") + cur;
+                    result[key = ind / 2 >> 0] = ((result[key] || "00") + cur).slice(1);
                     return result;
                 }, []);
                 let byte_str_arr_len = byte_str_arr.length + 1;
