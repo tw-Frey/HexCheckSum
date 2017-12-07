@@ -12,12 +12,30 @@
                 content: attr(check-sum);
                 color: red;
             }
-            p {
-                border: solid 1px black;
+            pre {
+                line-height: 1.5em;
             }
-            input {
+            pre > h4 {
+                margin: 0;
+            }
+            pre > div {
+                line-height: 0;
+            }
+            pre > div > span {
+                border-top: solid 1px;
+                border-right: solid 1px;
+                border-bottom: solid 1px;
+                padding: 0 5px;
+            }
+            pre > div > span:first-of-type {
+                border-left: solid 1px;
+            }
+            #command {
                 display: block;
                 width: 100%;
+            }
+            p {
+                border: solid 1px;
             }
             hr {
                 margin: 20px 0;
@@ -26,7 +44,17 @@
     </head>
     <body>
         <h1>客製指令 Check-Sum 計算</h1>
-        <h4>v1.3.1</h4>
+        <h4>v1.3.2</h4>
+<pre>
+<h4>Here Rule:</h4>
+<div><span>Head</span><span style=color:blue>Length</span><span>Command</span><span>N1</span><span>N2</span><span>...</span><span>Nx</span><span style=color:red>Sum</span></div>
+<div style=display:inline-block><span>Data</span></div> format is Hex, <strong>one char</strong>
+except <strong>Head = 0xFF55 (two bytes)</strong>
+<span style=color:blue>Length = the <em>length of bytes</em> array
+        from <strong>Command field</strong> to <strong>Sum field</strong></span>
+<span style=color:red>Sum = Length + Command + N1 + N2 + ... + Nx</span>
+<strong>(assume Sum field is <em>one-byte-length</em> ?!)</strong>
+</pre>
         <hr/>
         <span>輸入 (不含 Head, Length, Check-Sum)</span>
         <input id="command" type="text" placeholder="0102 或 01-02" onkeypress="return /^[0-9a-fA-F-_,.]+$/.test(event.key);"/>
