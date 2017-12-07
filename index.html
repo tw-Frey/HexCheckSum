@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset=UTF-8>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Hex Check Sum</title>
         <style>
             #preview::before {
@@ -30,6 +31,23 @@
             pre > div > span:first-of-type {
                 border-left: solid 1px;
             }
+            #accessory {
+                margin-left: auto;
+                text-align: right;
+                font-size: small;
+            }
+            #accessory > h4 {
+                margin: 10px 0;
+            }
+            #accessory > input {
+                width: 10%;
+            }
+            #accessory > input:last-of-type {
+                text-align: right;
+            }
+            .emiji {
+                font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", Times, Symbola, Aegyptus, Code2000, Code2001, Code2002, Musica, serif, LastResort;
+            }
             #command {
                 display: block;
                 width: 100%;
@@ -44,7 +62,7 @@
     </head>
     <body>
         <h1>客製指令 Check-Sum 計算</h1>
-        <h4>v1.3.2</h4>
+        <h4>v1.3.3</h4>
 <pre>
 <h4>Here Rule:</h4>
 <div><span>Head</span><span style=color:blue>Length</span><span>Command</span><span>N1</span><span>N2</span><span>...</span><span>Nx</span><span style=color:red>Sum</span></div>
@@ -55,6 +73,15 @@ except <strong>Head = 0xFF55 (two bytes)</strong>
 <span style=color:red>Sum = Length + Command + N1 + N2 + ... + Nx</span>
 <strong>(assume Sum field is <em>one-byte-length</em> ?!)</strong>
 </pre>
+        <hr/>
+        <div id=accessory>
+            <h4>輔助轉換</h4>
+            <label>10 進位</label>
+            <input type="number" id="dec_input" min=0 max=255 placeholder=0 onkeypress="return /^[0-9-_,]{0,3}$/.test(this.value);">
+            <span class=emiji>↔</span>
+            <input type="text" id="hex_input" maxlength=2 placeholder=0x0 onkeypress="return /^[0-9a-fA-F-_,.]+$/.test(event.key);">
+            <label>16 進位</label>
+        </div>
         <hr/>
         <span>輸入 (不含 Head, Length, Check-Sum)</span>
         <input id="command" type="text" placeholder="0102 或 01-02" onkeypress="return /^[0-9a-fA-F-_,.]+$/.test(event.key);"/>
@@ -67,12 +94,14 @@ except <strong>Head = 0xFF55 (two bytes)</strong>
     <script src=https://code.jquery.com/jquery-3.2.1.min.js></script>
     <script>
         $(() => {
-            const to_hex_str_with_prefix = (prefix, dec_str) => (prefix + dec_str.toString(16).toUpperCase()).slice(-2);
+            const to_hex_str_with_prefix = (prefix, num) => (prefix + num.toString(16).toUpperCase()).slice(-2);
             const separate = /[-_,.]/gi;
             const $command = $("#command");
             const $preview = $("#preview");
             const $present = $("#present");
-            $command.on("input", event => {
+            const $dec_num = $("#dec_input");
+            const $hex_num = $("#hex_input");
+            $command.on("input", () => {
                 var key;
                 let byte_str_arr = $command.val().replace(separate, "").split("").reduce((result, cur, ind) => {
                     result[key = ind / 2 >> 0] = to_hex_str_with_prefix(result[key] || "0", cur);
@@ -89,6 +118,13 @@ except <strong>Head = 0xFF55 (two bytes)</strong>
             });
             $preview.change(() => $present.text(
                 ($preview.attr("length") + $preview.text() + $preview.attr("check-sum")).replace(separate, "")
+            ));
+            $dec_num.on("input", () => $hex_num.val("0x" + 
+                //to_hex_str_with_prefix("0", parseInt($dec_num.val() || 0, 10))
+                parseInt($dec_num.val() || 0, 10).toString(16).toUpperCase()
+            ));
+            $hex_num.on("input", () => $dec_num.val(
+                parseInt($hex_num.val() || 0, 16)
             ));
         });
     </script>
