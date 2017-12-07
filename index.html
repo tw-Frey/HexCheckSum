@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=UTF-8>
+        <title>Hex Check Sum</title>
+        <style>
+            #preview::after {
+                content: attr(check-sum);
+                color: red;
+            }
+            p {
+                border: solid 1px black;
+            }
+            input {
+                display: block;
+                width: 100%;
+            }
+            hr {
+                margin: 20px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>客製指令 check-sum 計算</h1>
+        <h4>v1.0</h4>
+        <hr/>
+        <span>預覽 (紅為 check-sum)</span>
+        <p id="preview">&nbsp;</p>
+        <span>結果 (包含 check-sum)</span>
+        <p id="present">&nbsp;</p>
+        <hr/>
+        <span>輸入 (不含 check-sum)</span>
+        <input id="command" type="text" placeholder="FF55030102 或 FF-55-03-01-02">
+    </body>
+    <script src=https://code.jquery.com/jquery-3.2.1.min.js></script>
+    <script>
+        $(() => {
+            const KeyRegex = /^[0-9a-fA-F-_,.]+$/;
+            const separate = /[-_,.]/gi;
+            const $command = $("#command");
+            const $preview = $("#preview");
+            const $present = $("#present");
+            $command.on("keypress", event => {
+                var key = event.key;
+                if (!KeyRegex.test(key)) {
+                    return false;
+                }
+                let byte_str_arr = ($command.val() + key).replace(separate, "").split("").reduce((result, cur, ind) => {
+                    result[key = ind / 2 >> 0] = (result[key] || "") + cur;
+                    return result;
+                }, []);
+                $preview.text(byte_str_arr.join("-").toUpperCase()).attr("check-sum", "-"+
+                    [byte_str_arr.filter((cur, ind) => ind > 1).reduce((sum, cur) => sum + parseInt(cur, 16), 0)]
+                        .reduce((filled, check_sum) => (check_sum < 16 ? filled : "") + check_sum.toString(16).toUpperCase(), "0")
+                ).change();
+            });
+            $preview.change(() => $present.text(
+                ($preview.text()+$preview.attr("check-sum")).replace(separate, "")
+            ));
+        });
+    </script>
+</html>
